@@ -1,0 +1,61 @@
+service: teacher
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+  stage: dev
+  region: us-east-1
+  environment:
+    basePath: /${opt:stage, self:provider.stage}/${self:service}
+
+functions:
+  uploadCourseFile:
+    handler: handler.uploadCourseFile
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/upload-csv
+        method: POST
+  addCourse:
+    handler: handler.addCourse
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/course
+        mathod: POST
+  getAllCourses:
+    handler: handler.getAllCourses
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/courses
+        method: GET
+  getCourse:
+    handler: handler.getCourse
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/course/{id}
+        method: GET
+  editCourse:
+    handler: handler.editCourse
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/course/{id}
+        method: PUT
+  removeCourse:
+    handler: handler.removeCourse
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/course/{id}
+        method: DELETE
+  accept:
+    handler: handler.acceptInvokeRequest
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/request/accept
+        method: POST
+  decline:
+    handler: handler.declineInvokeRequest
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/request/decline
+        method: POST

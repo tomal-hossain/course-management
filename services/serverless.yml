@@ -1,0 +1,10 @@
+
+service: services
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+layers:
+  courseService:
+    path: course-service

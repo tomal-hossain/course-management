@@ -1,0 +1,37 @@
+service: student
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+  stage: dev
+  region: us-east-1
+  environment:
+    basePath: /${opt:stage, self:provider.stage}/${self:service}
+
+functions:
+  getAllCourses:
+    handler: handler.getAllCourses
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/courses
+        method: GET
+  getCourse:
+      handler: handler.getCourse
+      events:
+        - http:
+          path: ${self:provider.environment.basePath}/course/{id}
+          method: GET
+  getInvokedCourses:
+    handler: handler.getInvokedCourses
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/courses/invoked
+        method: GET
+  invoke:
+    handler: handler.invokeRequest
+    events:
+      - http:
+        path: ${self:provider.environment.basePath}/invoke/{id}
+        method: POST
