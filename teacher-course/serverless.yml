@@ -13,6 +13,7 @@ provider:
   region: us-east-1
   environment:
     DYNAMODB_TABLE: teacher-course-table
+    BUCKET_NAME: teacher-course-bucket
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -22,6 +23,9 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+        - s3:PutObject
+        - s3:DeleteObject
       Resource: "*"
 
 
@@ -57,6 +61,24 @@ functions:
       - http:
           path: ${self:service}/course/{id}
           method: DELETE
+  processFile:
+    handler: fileHandler.processFile
+    events:
+      - http:
+          path: ${self:service}/file
+          method: POST
+  uploadVideo:
+    handler: fileHandler.uploadVideo
+    events:
+      - http:
+          path: ${self:service}/video/{id}
+          method: POST
+  deleteVideo:
+    handler: fileHandler.deleteVideo
+    events:
+      - http:
+          path: ${self:service}/video/{id}
+          method: DELETE
 
 resources:
   Resources:
@@ -73,3 +95,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BUCKET_NAME}
